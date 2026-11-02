@@ -1,0 +1,354 @@
+/* ==========================================================================
+   SIRAPI - Sistem Informasi Arsip UKM Kependudukan
+   Master Theme: Modern Harmonious Nature Emerald
+   ========================================================================== */
+
+:root {
+    --primary: #15803d;         /* Hijau Utama */
+    --primary-hover: #166534;   /* Hijau Gelap saat Hover */
+    --primary-light: #22c55e;   /* Hijau Aksen Terang */
+    --primary-soft: #f0fdf4;    /* Hijau Lembut untuk Latar Tabel */
+    --primary-border: #bbf7d0;  /* Garis Border Hijau Lembut */
+    
+    --bg-page: #f8fafc;         /* Background Halaman */
+    --surface: #ffffff;         /* Background Card/Tabel */
+    --text-main: #1e293b;       /* Teks Utama */
+    --text-muted: #64748b;      /* Teks Keterangan */
+    --border-color: #e2e8f0;    /* Border Netral */
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 16px rgba(21, 128, 61, 0.08);
+    --shadow-lg: 0 10px 25px rgba(21, 128, 61, 0.12);
+    --radius: 12px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    line-height: 1.6;
+    font-size: 13px;
+    padding: 30px 20px;
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+/* ==========================================================================
+   Typography & Navigation Header
+   ========================================================================== */
+h1 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--primary-hover);
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 24px 0 14px;
+    border-bottom: 2px solid var(--primary-border);
+    padding-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+p {
+    margin: 4px 0 16px;
+    color: var(--text-muted);
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+a:hover {
+    color: var(--primary-hover);
+}
+
+/* Tombol Kembali yang Rapi di Atas Halaman */
+p a[href*="index.php"] {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--text-muted);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+p a[href*="index.php"]:hover {
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-color: var(--primary-border);
+    transform: translateX(-3px);
+}
+
+/* ==========================================================================
+   Tombol Aksi Utama (Tambah Data, Simpan)
+   ========================================================================== */
+.tombol, 
+button[type="submit"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    color: #ffffff !important;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none !important;
+    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
+    transition: all 0.25s ease;
+}
+
+.tombol:hover, 
+button[type="submit"]:hover {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+    box-shadow: 0 6px 16px rgba(21, 128, 61, 0.35);
+    transform: translateY(-2px);
+}
+
+.tombol {
+    margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   PENGEMBANGAN KHUSUS: CSS TABEL MODERN, BERSIH & ELEGAN
+   ========================================================================== */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    margin: 16px 0 30px;
+}
+
+/* Header Tabel */
+thead tr {
+    background: linear-gradient(180deg, #f0fdf4 0%, #e6f9ed 100%);
+}
+
+th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-hover);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    border-bottom: 2px solid var(--primary-border);
+    white-space: nowrap;
+}
+
+/* Baris Isi Tabel */
+tbody tr {
+    background-color: #ffffff;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Efek Belang Lembut (Zebra Striping) */
+tbody tr:nth-child(even) {
+    background-color: #fbfdfc;
+}
+
+/* Efek Hover Baris dengan Nuansa Hijau Lembut */
+tbody tr:hover {
+    background-color: #f0fdf4 !important;
+    transform: scale(1.002);
+}
+
+td {
+    padding: 13px 16px;
+    font-size: 13px;
+    color: var(--text-main);
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Kolom ID (Nomor Induk) */
+td:first-child {
+    font-weight: 700;
+    color: #475569;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Kolom Aksi di Tabel */
+.aksi {
+    white-space: nowrap;
+    text-align: right;
+}
+
+.aksi a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    margin: 0 3px;
+    text-decoration: none !important;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+}
+
+/* Tombol Edit (Kuning Emas Elegan) */
+.aksi a[href*="edit.php"] {
+    background-color: #fef3c7;
+    color: #b45309 !important;
+    border: 1px solid #fde68a;
+}
+
+.aksi a[href*="edit.php"]:hover {
+    background-color: #fde68a;
+    color: #78350f !important;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(180, 83, 9, 0.2);
+}
+
+/* Tombol Hapus (Merah Coral Halus) */
+.aksi a.hapus {
+    background-color: #fee2e2;
+    color: #b91c1c !important;
+    border: 1px solid #fecaca;
+}
+
+.aksi a.hapus:hover {
+    background-color: #fecaca;
+    color: #7f1d1d !important;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(185, 28, 28, 0.2);
+}
+
+/* Status Data Kosong di Tabel */
+tbody tr td[colspan] {
+    text-align: center;
+    padding: 35px 20px;
+    color: var(--text-muted);
+    font-style: italic;
+    background-color: #ffffff;
+}
+
+/* ==========================================================================
+   Form Input Card
+   ========================================================================== */
+form {
+    width: 100%;
+    max-width: 650px;
+    background: var(--surface);
+    padding: 30px 26px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    border-top: 5px solid var(--primary);
+    box-shadow: var(--shadow-md);
+    margin: 18px 0 35px;
+}
+
+label {
+    display: block;
+    margin-bottom: 18px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #334155;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="email"],
+input[type="file"],
+select,
+textarea {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    padding: 11px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text-main);
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
+}
+
+/* ==========================================================================
+   Pesan Status & Notifikasi
+   ========================================================================== */
+.hapus, 
+.alert-error {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    padding: 11px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.alert-success {
+    background-color: var(--primary-soft);
+    color: var(--primary-hover);
+    border: 1px solid var(--primary-border);
+    padding: 11px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+/* Responsive Table Scroll */
+@media (max-width: 800px) {
+    body {
+        padding: 15px 12px;
+    }
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
