@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "koneksi.php";
+require_once __DIR__ . "/../includes/koneksi.php";
 
 $error = "";
 $success = "";
@@ -25,10 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (mysqli_stmt_num_rows($cek) > 0) {
             $error = "Username '$username' sudah terdaftar. Silakan gunakan username lain.";
         } else {
+            $password_hashed = md5($password);
             $sql = "INSERT INTO pengguna (nama_pengguna, username, password, nim, jabatan, role) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = mysqli_prepare($conn, $sql);
             if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "ssssss", $nama_pengguna, $username, $password, $nim, $jabatan, $role);
+                mysqli_stmt_bind_param($stmt, "ssssss", $nama_pengguna, $username, $password_hashed, $nim, $jabatan, $role);
                 if (mysqli_stmt_execute($stmt)) {
                     $success = "Pendaftaran berhasil! Silakan <a href='login.php' style='color:#15803d; font-weight:bold; text-decoration:underline;'>Klik di sini untuk Login</a>.";
                 } else {
@@ -47,8 +48,8 @@ $data = $_POST ?? [];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Pengguna Baru - SIRAPI</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Pendaftaran Akun Baru - SIRAPI</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         body {
             background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
@@ -56,96 +57,101 @@ $data = $_POST ?? [];
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px 16px;
         }
-        .card-register {
+        .card-reg {
             background: #ffffff;
             width: 100%;
             max-width: 480px;
-            padding: 38px 32px;
+            padding: 34px 28px;
             border-radius: 14px;
             box-shadow: 0 15px 35px rgba(21, 128, 61, 0.15);
             border: 1px solid #bbf7d0;
-            border-top: 6px solid #15803d;
         }
-        .header-register {
+        .reg-header {
             text-align: center;
             margin-bottom: 22px;
         }
-        .header-register h1 {
-            font-size: 22px;
-            color: #14532d;
-            margin-bottom: 6px;
+        .reg-header h1 {
+            font-size: 21px;
+            color: #0f172a;
+            margin-bottom: 4px;
             justify-content: center;
         }
-        .header-register p {
-            font-size: 13px;
+        .reg-header p {
+            font-size: 12.5px;
             color: #64748b;
             margin: 0;
         }
-        .card-register form {
-            background: transparent;
-            padding: 0;
-            border: none;
-            box-shadow: none;
-            margin: 0;
-            max-width: 100%;
-        }
-        .card-register form label {
-            text-transform: none;
-            font-size: 13px;
-            color: #334155;
+        form label {
+            display: block;
             margin-bottom: 12px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .card-register form input {
-            padding: 10px 12px;
-            font-size: 13px;
-            border-radius: 6px;
+        form input {
+            display: block;
+            width: 100%;
             margin-top: 5px;
-            border-color: #cbd5e1;
+            padding: 9px 12px;
+            font-family: inherit;
+            font-size: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.2s;
         }
-        .card-register form input:focus {
+        form input:focus {
             border-color: #15803d;
             box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
         }
         .btn-submit-reg {
             width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #15803d 0%, #166534 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 10px rgba(21, 128, 61, 0.2);
             margin-top: 10px;
+            padding: 11px;
+            font-size: 13.5px;
+            font-weight: 700;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
+            transition: all 0.25s ease;
         }
         .btn-submit-reg:hover {
             background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            box-shadow: 0 6px 16px rgba(21, 128, 61, 0.35);
             transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(21, 128, 61, 0.3);
         }
         .footer-links {
-            margin-top: 22px;
+            margin-top: 18px;
             text-align: center;
-            font-size: 13px;
+            font-size: 12px;
             color: #64748b;
-            border-top: 1px solid #f1f5f9;
-            padding-top: 16px;
+        }
+        .footer-links a {
+            color: #15803d;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="card-register">
-        <div class="header-register">
-            <h1>Registrasi Akun Baru</h1>
-            <p>Daftarkan akun anggota/staff UKM Kependudukan</p>
+    <div class="card-reg">
+        <div class="reg-header">
+            <h1>Pendaftaran Akun Baru</h1>
+            <p>Registrasi untuk mengakses sistem kearsipan SIRAPI</p>
         </div>
 
         <?php if ($error !== ""): ?>
-            <div class="hapus"><?php echo htmlspecialchars($error); ?></div>
+            <div class="alert-error"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
 
         <?php if ($success !== ""): ?>
@@ -175,9 +181,10 @@ $data = $_POST ?? [];
         <div class="footer-links">
             Sudah memiliki akun? <a href="login.php">Masuk di sini</a>
             <div style="margin-top: 8px;">
-                <a href="index.php" style="color: #64748b; font-size: 12px;">&larr; Kembali ke Beranda Publik</a>
+                <a href="../index.php" style="color: #64748b; font-size: 12px;">&larr; Kembali ke Beranda Publik</a>
             </div>
         </div>
     </div>
 </body>
 </html>
+

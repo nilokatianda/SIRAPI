@@ -1,5 +1,6 @@
 <?php
-require_once "../koneksi.php";
+require_once "../includes/auth_check.php";
+require_once "../includes/koneksi.php";
 $error = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $nama_periode = trim($_POST['nama_periode'] ?? '');
@@ -23,7 +24,7 @@ $data = [];
 ?>
 <!DOCTYPE html>
 <html lang="id">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Tambah Periode</title><link rel="stylesheet" href="../style.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Tambah Periode</title><link rel="stylesheet" href="../assets/css/style.css"></head>
 <body>
     <h1>Tambah Data Periode</h1>
     <p><a href="index.php">Kembali</a></p>

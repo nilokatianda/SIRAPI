@@ -1,4 +1,8 @@
 <?php
+/**
+ * SIRAPI - Konfigurasi Koneksi Basis Data MySQLi
+ */
+
 $host = "localhost";
 $user = "root";
 $password = "";
@@ -12,3 +16,4 @@ if (!$conn) {
 
 mysqli_set_charset($conn, "utf8mb4");
 ?>
+

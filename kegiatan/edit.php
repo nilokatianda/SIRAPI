@@ -1,5 +1,6 @@
 <?php
-require_once "../koneksi.php";
+require_once "../includes/auth_check.php";
+require_once "../includes/koneksi.php";
 
 $id = isset($_GET["id"]) ? (int)$_GET["id"] : 0;
 $cek = mysqli_prepare($conn, "SELECT id_kegiatan, nama_kegiatan, deskripsi, tanggal_kegiatan, id_periode FROM kegiatan WHERE id_kegiatan = ?");
@@ -73,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Kegiatan - SIRAPI</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
     <h1>Edit Data Kegiatan</h1>

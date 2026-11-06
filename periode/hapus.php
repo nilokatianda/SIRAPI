@@ -1,5 +1,6 @@
 <?php
-require_once "../koneksi.php";
+require_once "../includes/auth_check.php";
+require_once "../includes/koneksi.php";
 $id = isset($_GET["id"]) ? (int)$_GET["id"] : 0;
 $stmt = mysqli_prepare($conn, "DELETE FROM periode WHERE id_periode = ?");
 mysqli_stmt_bind_param($stmt, "i", $id);

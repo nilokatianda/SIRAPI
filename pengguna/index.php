@@ -1,5 +1,7 @@
 <?php
-require_once "../koneksi.php";
+require_once "../includes/auth_check.php";
+require_admin();
+require_once "../includes/koneksi.php";
 $result = mysqli_query($conn, "SELECT id_pengguna, nama_pengguna, username, nim, jabatan, role FROM pengguna");
 if (!$result) {
     die("Gagal mengambil data: " . mysqli_error($conn));
@@ -11,11 +13,11 @@ if (!$result) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Pengguna - SIRAPI</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
     <h1>Data Pengguna</h1>
-    <p><a href="../index.php">Kembali ke Beranda</a></p>
+    <p><a href="<?= $dashboard_url ?>" class="btn-kembali">&larr; <?= $dashboard_label ?></a></p>
     <a class="tombol" href="tambah.php">Tambah Data Pengguna</a>
     <table>
         <thead><tr><th>ID</th><th>Nama Pengguna</th><th>Username</th><th>NIM</th><th>Jabatan</th><th>Role</th><th>Aksi</th></tr></thead>

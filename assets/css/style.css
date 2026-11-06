@@ -82,7 +82,9 @@ a:hover {
 }
 
 /* Tombol Kembali yang Rapi di Atas Halaman */
-p a[href*="index.php"] {
+p a[href*="index.php"],
+p a[href*="dashboard.php"],
+.btn-kembali {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -97,7 +99,9 @@ p a[href*="index.php"] {
     transition: all 0.2s ease;
 }
 
-p a[href*="index.php"]:hover {
+p a[href*="index.php"]:hover,
+p a[href*="dashboard.php"]:hover,
+.btn-kembali:hover {
     background: var(--primary-soft);
     color: var(--primary);
     border-color: var(--primary-border);
@@ -352,3 +356,413 @@ textarea:focus {
         white-space: nowrap;
     }
 }
+
+/* ==========================================================================
+   Modul Keterlambatan Denda & Pembayaran QRIS / E-Wallet
+   ========================================================================== */
+.badge-denda-bebas {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    background-color: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.badge-denda-telat {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.badge-denda-lunas {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    background-color: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.nominal-denda-text {
+    font-weight: 800;
+    color: #b91c1c;
+    font-size: 13px;
+    display: block;
+    margin-top: 2px;
+}
+
+.btn-bayar-denda {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: #ffffff !important;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 4px;
+}
+
+.btn-bayar-denda:hover {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35);
+}
+
+.btn-tandai-lunas {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #f3f4f6;
+    color: #374151 !important;
+    border: 1px solid #d1d5db;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-tandai-lunas:hover {
+    background-color: #e5e7eb;
+    color: #111827 !important;
+}
+
+/* Modal Popup Styles */
+.modal-denda-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 16px;
+    animation: fadeInModal 0.2s ease-out;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-denda-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 460px;
+    border-radius: 18px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    position: relative;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-denda-header {
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+    color: #ffffff;
+    padding: 18px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.badge-qris-top {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.modal-denda-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.modal-denda-header p {
+    margin: 3px 0 0;
+    color: #a7f3d0;
+    font-size: 12px;
+}
+
+.btn-close-modal {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #ffffff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-close-modal:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.modal-denda-body {
+    padding: 20px 22px;
+    overflow-y: auto;
+}
+
+.tagihan-box {
+    background: #fef2f2;
+    border: 1px dashed #fca5a5;
+    border-radius: 12px;
+    padding: 12px 16px;
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.tagihan-label {
+    display: block;
+    font-size: 11px;
+    color: #991b1b;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.tagihan-nominal {
+    font-size: 24px;
+    font-weight: 800;
+    color: #b91c1c;
+    letter-spacing: -0.5px;
+}
+
+.tabs-metode {
+    display: flex;
+    gap: 6px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 8px 10px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.tab-btn.active {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.qris-frame {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.qris-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.qris-logo-text {
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #b91c1c;
+    border: 2px solid #b91c1c;
+    padding: 1px 8px;
+    border-radius: 4px;
+}
+
+.qris-desc {
+    font-size: 11px;
+    font-weight: 700;
+    color: #334155;
+}
+
+.qris-qr-wrapper {
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.qris-footer-info {
+    font-size: 11px;
+    color: #475569;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 10px;
+    margin-top: 10px;
+    line-height: 1.4;
+}
+
+.ewallet-info-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.ewallet-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.ewallet-badge-nama {
+    background: #0284c7;
+    color: white;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 6px;
+}
+
+.ewallet-verified {
+    font-size: 11px;
+    color: #16a34a;
+    font-weight: 700;
+}
+
+.ewallet-nomor-box {
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.label-nomor {
+    font-size: 10px;
+    color: #64748b;
+    display: block;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.copy-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.nomor-ewallet {
+    font-size: 17px;
+    color: #0f172a;
+    font-family: monospace;
+}
+
+.btn-copy-num {
+    background: #e2e8f0;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    color: #334155;
+    transition: all 0.2s;
+}
+
+.btn-copy-num:hover {
+    background: #cbd5e1;
+}
+
+.nama-pemilik {
+    display: block;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 6px;
+}
+
+.ewallet-petunjuk {
+    font-size: 11px;
+    color: #475569;
+}
+
+.ewallet-petunjuk ol {
+    margin-left: 18px;
+    margin-top: 6px;
+    line-height: 1.6;
+}
+
+.form-konfirmasi-denda {
+    margin-top: 18px;
+}
+
+.btn-konfirmasi-bayar {
+    width: 100%;
+    background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+    color: white;
+    border: none;
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
+    transition: all 0.2s;
+}
+
+.btn-konfirmasi-bayar:hover {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(21, 128, 61, 0.35);
+}
+

@@ -1,5 +1,6 @@
 <?php
-require_once "../koneksi.php";
+require_once "../includes/auth_check.php";
+require_once "../includes/koneksi.php";
 $result = mysqli_query($conn, "SELECT id_kegiatan, nama_kegiatan, deskripsi, tanggal_kegiatan, id_periode FROM kegiatan");
 if (!$result) {
     die("Gagal mengambil data: " . mysqli_error($conn));
@@ -11,11 +12,11 @@ if (!$result) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Kegiatan - SIRAPI</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
     <h1>Data Kegiatan</h1>
-    <p><a href="../index.php">Kembali ke Beranda</a></p>
+    <p><a href="<?= $dashboard_url ?>" class="btn-kembali">&larr; <?= $dashboard_label ?></a></p>
     <a class="tombol" href="tambah.php">Tambah Data Kegiatan</a>
     <table>
         <thead><tr><th>ID</th><th>Nama Kegiatan</th><th>Deskripsi</th><th>Tanggal Kegiatan</th><th>ID Periode</th><th>Aksi</th></tr></thead>

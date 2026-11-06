@@ -1,18 +1,22 @@
 <?php
 session_start();
-require_once "koneksi.php";
+require_once __DIR__ . "/../includes/koneksi.php";
 
 // Jika sudah login, langsung arahkan ke halamannya masing-masing
 if (isset($_SESSION['login']) && $_SESSION['login'] === true) {
     if ($_SESSION['role'] === 'admin') {
-        header("Location: admin_dashboard.php");
+        header("Location: ../dashboard/admin_dashboard.php");
     } else {
-        header("Location: user_dashboard.php");
+        header("Location: ../dashboard/user_dashboard.php");
     }
     exit;
 }
 
 $error = "";
+$pesan_info = "";
+if (isset($_GET['pesan']) && $_GET['pesan'] === 'belum_login') {
+    $pesan_info = "Sesi belum aktif atau telah berakhir. Silakan login terlebih dahulu untuk mengakses halaman tersebut.";
+}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = trim($_POST['username'] ?? '');
@@ -44,11 +48,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION['jabatan'] = $user['jabatan'];
             $_SESSION['role'] = $user['role'];
 
+            // Jika ada tujuan URL redirect dari halaman yang dicoba diakses sebelumnya
+            if (!empty($_SESSION['redirect_url'])) {
+                $target_redirect = $_SESSION['redirect_url'];
+                unset($_SESSION['redirect_url']);
+                header("Location: " . $target_redirect);
+                exit;
+            }
+
             // Deteksi otomatis role
             if ($user['role'] === 'admin') {
-                header("Location: admin_dashboard.php");
+                header("Location: ../dashboard/admin_dashboard.php");
             } else {
-                header("Location: user_dashboard.php");
+                header("Location: ../dashboard/user_dashboard.php");
             }
             exit;
         } else {
@@ -66,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Sistem - SIRAPI</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 
     <style>
         body {
@@ -86,134 +98,180 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             border-radius: 14px;
             box-shadow: 0 15px 35px rgba(21, 128, 61, 0.15);
             border: 1px solid #bbf7d0;
-            border-top: 6px solid #15803d;
         }
 
-        .header-login {
+        .login-header {
             text-align: center;
-            margin-bottom: 26px;
+            margin-bottom: 28px;
         }
 
-        .header-login .logo-badge {
+        .logo-login {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            background: #dcfce7;
-            color: #15803d;
-            padding: 5px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+            color: #ffffff;
+            border-radius: 12px;
             margin-bottom: 12px;
-            letter-spacing: 0.5px;
-            border: 1px solid #bbf7d0;
+            box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
         }
 
-        .header-login h1 {
-            font-size: 24px;
-            color: #14532d;
-            margin-bottom: 6px;
+        .login-header h1 {
+            font-size: 22px;
+            color: #0f172a;
+            margin-bottom: 4px;
             justify-content: center;
         }
 
-        .header-login p {
+        .login-header p {
             font-size: 13px;
             color: #64748b;
             margin: 0;
         }
 
-        .card-login form {
-            background: transparent;
-            padding: 0;
-            border: none;
-            box-shadow: none;
-            margin: 0;
-            max-width: 100%;
-        }
-
-        .card-login form label {
-            text-transform: none;
-            font-size: 13px;
-            color: #334155;
-            margin-bottom: 18px;
-        }
-
-        .card-login form input {
-            padding: 12px 14px;
-            font-size: 14px;
+        .alert-error {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 10px 14px;
             border-radius: 8px;
-            margin-top: 6px;
-            border-color: #cbd5e1;
+            font-size: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .card-login form input:focus {
+        .alert-info-guard {
+            background-color: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 16px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .login-form input {
+            display: block;
+            width: 100%;
+            margin-top: 6px;
+            padding: 11px 14px;
+            font-family: inherit;
+            font-size: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .login-form input:focus {
             border-color: #15803d;
             box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
         }
 
         .btn-submit-login {
             width: 100%;
-            padding: 13px;
-            background: linear-gradient(135deg, #15803d 0%, #166534 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
             margin-top: 10px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
+            transition: all 0.25s ease;
         }
 
         .btn-submit-login:hover {
             background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-            transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(21, 128, 61, 0.35);
+            transform: translateY(-2px);
         }
 
         .role-hint {
+            margin-top: 18px;
+            padding: 10px 12px;
             background: #f0fdf4;
-            border: 1px dashed #86efac;
             border-radius: 8px;
-            padding: 10px 14px;
-            margin-top: 20px;
-            font-size: 12px;
+            border: 1px dashed #86efac;
+            font-size: 11.5px;
             color: #166534;
+            line-height: 1.45;
             text-align: center;
         }
 
         .footer-links {
-            margin-top: 24px;
+            margin-top: 22px;
             text-align: center;
-            font-size: 13px;
+            font-size: 12.5px;
             color: #64748b;
-            border-top: 1px solid #f1f5f9;
-            padding-top: 18px;
+        }
+
+        .footer-links a {
+            color: #15803d;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
-
 <body>
     <div class="card-login">
-        <div class="header-login">
-            <span class="logo-badge">&#128272; Satu Pintu Masuk</span>
-            <h1>SIRAPI Login</h1>
-            <p>Sistem Informasi Arsip UKM Kependudukan</p>
+        <div class="login-header">
+            <div class="logo-login">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+                    <path d="M6 6h10"/>
+                    <path d="M6 10h10"/>
+                </svg>
+            </div>
+            <h1>Masuk ke SIRAPI</h1>
+            <p>Satu pintu masuk untuk Admin & Pengguna</p>
         </div>
 
-        <?php if ($error !== ""): ?>
-            <div class="hapus">
-                <?php echo htmlspecialchars($error); ?>
+        <?php if ($pesan_info !== ""): ?>
+            <div class="alert-info-guard">
+                <span>&#128274;</span>
+                <div><?php echo htmlspecialchars($pesan_info); ?></div>
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="">
+        <?php if ($error !== ""): ?>
+            <div class="alert-error">
+                <span>&#9888;</span>
+                <div><?php echo htmlspecialchars($error); ?></div>
+            </div>
+        <?php endif; ?>
+
+        <form method="POST" action="" class="login-form">
             <label>
                 Username
                 <input
                     type="text"
                     name="username"
+                    value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>"
                     placeholder="Masukkan username Anda"
                     required
                     autofocus
@@ -249,7 +307,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <div style="margin-top: 10px;">
                 <a
-                    href="index.php"
+                    href="../index.php"
                     style="color: #64748b; font-size: 12px; font-weight: normal;"
                 >
                     &larr; Kembali ke Beranda Publik
@@ -259,3 +317,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </div>
 </body>
 </html>
+

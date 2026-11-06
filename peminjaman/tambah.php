@@ -1,111 +1,183 @@
+
 <?php
-require_once "../koneksi.php";
+require_once "../includes/auth_check.php";
+require_once "../includes/koneksi.php";
+require_once "../includes/denda_helper.php";
+
+ensure_denda_schema($conn);
 
 $error = "";
 
-// Ambil daftar arsip untuk pilihan dropdown
+// Ambil ID pengguna dari akun yang sedang login
+$id_pengguna = (int)($_SESSION['id_pengguna'] ?? 0);
+
+// Ambil daftar arsip
 $arsip_list = [];
 $res_arsip = mysqli_query($conn, "SELECT id_arsip, nama_arsip FROM arsip ORDER BY nama_arsip ASC");
+
 if ($res_arsip) {
     while ($row = mysqli_fetch_assoc($res_arsip)) {
         $arsip_list[] = $row;
     }
 }
 
-// Ambil daftar pengguna untuk pilihan dropdown
-$pengguna_list = [];
-$res_pengguna = mysqli_query($conn, "SELECT id_pengguna, nama_pengguna, jabatan FROM pengguna ORDER BY nama_pengguna ASC");
-if ($res_pengguna) {
-    while ($row = mysqli_fetch_assoc($res_pengguna)) {
-        $pengguna_list[] = $row;
-    }
-}
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $id_arsip = !empty($_POST['id_arsip']) ? (int)$_POST['id_arsip'] : 0;
-    $id_pengguna = !empty($_POST['id_pengguna']) ? (int)$_POST['id_pengguna'] : 0;
     $tanggal_pinjam = trim($_POST['tanggal_pinjam'] ?? '');
-    $tanggal_kembali = trim($_POST['tanggal_kembali'] ?? '');
-    $status_peminjaman = trim($_POST['status_peminjaman'] ?? '');
+    $status_peminjaman = "Dipinjam";
 
-    if ($tanggal_pinjam === '') $tanggal_pinjam = null;
-    if ($tanggal_kembali === '') $tanggal_kembali = null;
-
-    if ($id_arsip <= 0 || $id_pengguna <= 0) {
-        $error = "Harap pilih Arsip dan Pengguna yang valid dari daftar.";
+    if ($id_pengguna <= 0) {
+        $error = "ID pengguna tidak ditemukan. Silakan login kembali.";
+    } elseif ($id_arsip <= 0) {
+        $error = "Silakan pilih arsip.";
+    } elseif ($tanggal_pinjam === '') {
+        $error = "Tanggal pinjam wajib diisi.";
     } else {
-        try {
-            $sql = "INSERT INTO peminjaman (id_arsip, id_pengguna, tanggal_pinjam, tanggal_kembali, status_peminjaman) VALUES (?, ?, ?, ?, ?)";
-            $stmt = mysqli_prepare($conn, $sql);
-            if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "iisss", $id_arsip, $id_pengguna, $tanggal_pinjam, $tanggal_kembali, $status_peminjaman);
-                if (mysqli_stmt_execute($stmt)) {
-                    header("Location: index.php");
-                    exit;
+        // Validasi tanggal pinjam
+        $tanggal = DateTime::createFromFormat('!Y-m-d', $tanggal_pinjam);
+
+        if (!$tanggal || $tanggal->format('Y-m-d') !== $tanggal_pinjam) {
+            $error = "Tanggal pinjam tidak valid.";
+        } else {
+            // Hitung tanggal kembali otomatis 5 hari setelah pinjam
+            $tanggal->modify('+5 days');
+            $tanggal_kembali = $tanggal->format('Y-m-d');
+
+            try {
+                $sql = "INSERT INTO peminjaman
+                        (id_arsip, id_pengguna, tanggal_pinjam, tanggal_kembali, status_peminjaman)
+                        VALUES (?, ?, ?, ?, ?)";
+
+                $stmt = mysqli_prepare($conn, $sql);
+
+                if ($stmt) {
+                    mysqli_stmt_bind_param(
+                        $stmt,
+                        "iisss",
+                        $id_arsip,
+                        $id_pengguna,
+                        $tanggal_pinjam,
+                        $tanggal_kembali,
+                        $status_peminjaman
+                    );
+
+                    if (mysqli_stmt_execute($stmt)) {
+                        header("Location: index.php");
+                        exit;
+                    } else {
+                        $error = "Gagal menambahkan data: " . mysqli_stmt_error($stmt);
+                    }
                 } else {
-                    $error = "Gagal menambahkan data: " . mysqli_stmt_error($stmt);
+                    $error = "Gagal menyiapkan query: " . mysqli_error($conn);
                 }
-            } else {
-                $error = "Gagal menyiapkan query: " . mysqli_error($conn);
+            } catch (mysqli_sql_exception $e) {
+                $error = "Gagal menyimpan peminjaman. Periksa kembali data arsip dan pengguna.";
             }
-        } catch (mysqli_sql_exception $e) {
-            $error = "Gagal menambahkan data (Relasi database gagal): Pastikan ID Arsip dan Pengguna tersedia di database.";
         }
     }
 }
+
+// Mengatur tanggal pada formulir
 $data = $_POST;
+$tanggal_pinjam_form = $data['tanggal_pinjam'] ?? date('Y-m-d');
+
+$tanggal_kembali_form = '';
+$tanggal_form = DateTime::createFromFormat('!Y-m-d', $tanggal_pinjam_form);
+
+if ($tanggal_form && $tanggal_form->format('Y-m-d') === $tanggal_pinjam_form) {
+    $tanggal_form->modify('+5 days');
+    $tanggal_kembali_form = $tanggal_form->format('Y-m-d');
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Peminjaman - SIRAPI</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
+
     <h1>Tambah Data Peminjaman</h1>
     <p><a href="index.php">Kembali</a></p>
-    <?php if ($error !== "") echo "<p class='hapus'>" . htmlspecialchars($error, ENT_QUOTES, 'UTF-8') . "</p>"; ?>
+
+    <?php if ($error !== ""): ?>
+        <p class="hapus">
+            <?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
+        </p>
+    <?php endif; ?>
+
     <form method="post">
+
         <label>Pilih Arsip
             <select name="id_arsip" required>
                 <option value="">-- Pilih Arsip --</option>
+
                 <?php foreach ($arsip_list as $a): ?>
-                    <option value="<?php echo (int)$a['id_arsip']; ?>" <?php echo (isset($data['id_arsip']) && (int)$data['id_arsip'] === (int)$a['id_arsip']) ? 'selected' : ''; ?>>
+                    <option
+                        value="<?php echo (int)$a['id_arsip']; ?>"
+                        <?php echo (isset($data['id_arsip']) && (int)$data['id_arsip'] === (int)$a['id_arsip']) ? 'selected' : ''; ?>
+                    >
                         <?php echo htmlspecialchars($a['nama_arsip'], ENT_QUOTES, 'UTF-8'); ?>
                     </option>
                 <?php endforeach; ?>
+
             </select>
         </label>
-        
-        <label>Pilih Pengguna
-            <select name="id_pengguna" required>
-                <option value="">-- Pilih Pengguna --</option>
-                <?php foreach ($pengguna_list as $p): ?>
-                    <option value="<?php echo (int)$p['id_pengguna']; ?>" <?php echo (isset($data['id_pengguna']) && (int)$data['id_pengguna'] === (int)$p['id_pengguna']) ? 'selected' : ''; ?>>
-                        <?php echo htmlspecialchars($p['nama_pengguna'] . ' - ' . $p['jabatan'], ENT_QUOTES, 'UTF-8'); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </label>
-        
+
         <label>Tanggal Pinjam
-            <input type="date" name="tanggal_pinjam" value="<?php echo htmlspecialchars((string)($data['tanggal_pinjam'] ?? date('Y-m-d')), ENT_QUOTES, 'UTF-8'); ?>">
+            <input
+                type="date"
+                name="tanggal_pinjam"
+                id="tanggal_pinjam"
+                value="<?php echo htmlspecialchars($tanggal_pinjam_form, ENT_QUOTES, 'UTF-8'); ?>"
+                required
+            >
         </label>
-        
-        <label>Tanggal Kembali (kosongkan jika belum kembali)
-            <input type="date" name="tanggal_kembali" value="<?php echo htmlspecialchars((string)($data['tanggal_kembali'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
+
+        <label>Batas Tanggal Kembali
+            <input
+                type="date"
+                name="tanggal_kembali"
+                id="tanggal_kembali"
+                value="<?php echo htmlspecialchars($tanggal_kembali_form, ENT_QUOTES, 'UTF-8'); ?>"
+                readonly
+            >
         </label>
-        
+
         <label>Status Peminjaman
-            <select name="status_peminjaman" required>
-                <option value="Dipinjam" <?php echo (($data['status_peminjaman'] ?? '') === 'Dipinjam') ? 'selected' : ''; ?>>Dipinjam</option>
-                <option value="Dikembalikan" <?php echo (($data['status_peminjaman'] ?? '') === 'Dikembalikan') ? 'selected' : ''; ?>>Dikembalikan</option>
-            </select>
+            <input type="text" value="Dipinjam" readonly>
         </label>
-        
+
         <button type="submit">Simpan</button>
+
     </form>
+
+    <script>
+        const tanggalPinjam = document.getElementById('tanggal_pinjam');
+        const tanggalKembali = document.getElementById('tanggal_kembali');
+
+        function hitungTanggalKembali() {
+            if (!tanggalPinjam.value) {
+                tanggalKembali.value = '';
+                return;
+            }
+
+            const tanggal = new Date(tanggalPinjam.value + 'T00:00:00');
+            tanggal.setDate(tanggal.getDate() + 5);
+
+            const tahun = tanggal.getFullYear();
+            const bulan = String(tanggal.getMonth() + 1).padStart(2, '0');
+            const hari = String(tanggal.getDate()).padStart(2, '0');
+
+            tanggalKembali.value = `${tahun}-${bulan}-${hari}`;
+        }
+
+        tanggalPinjam.addEventListener('change', hitungTanggalKembali);
+        hitungTanggalKembali();
+    </script>
+
 </body>
 </html>

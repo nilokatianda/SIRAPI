@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once "koneksi.php";
+require_once __DIR__ . "/includes/koneksi.php";
+
 $is_logged_in = isset($_SESSION['login']) && $_SESSION['login'] === true;
 $user_role = $_SESSION['role'] ?? '';
 $user_name = $_SESSION['nama_pengguna'] ?? '';
@@ -471,12 +472,12 @@ $user_name = $_SESSION['nama_pengguna'] ?? '';
             <div>
                 <?php if ($is_logged_in): ?>
                     <?php if ($user_role === 'admin'): ?>
-                        <a href="admin_dashboard.php" class="btn-login-header">&#128737; Panel Admin</a>
+                        <a href="dashboard/admin_dashboard.php" class="btn-login-header">&#128737; Panel Admin</a>
                     <?php else: ?>
-                        <a href="user_dashboard.php" class="btn-login-header">&#128100; Halaman Saya</a>
+                        <a href="dashboard/user_dashboard.php" class="btn-login-header">&#128100; Halaman Saya</a>
                     <?php endif; ?>
                 <?php else: ?>
-                    <a href="login.php" class="btn-login-header">
+                    <a href="auth/login.php" class="btn-login-header">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -510,16 +511,16 @@ $user_name = $_SESSION['nama_pengguna'] ?? '';
                 </p>
                 <div class="hero-buttons">
                     <?php if (!$is_logged_in): ?>
-                        <a href="login.php" class="btn-primary-hero">
+                        <a href="auth/login.php" class="btn-primary-hero">
                             Masuk ke Sistem &rarr;
                         </a>
                     <?php else: ?>
                         <?php if ($user_role === 'admin'): ?>
-                            <a href="admin_dashboard.php" class="btn-primary-hero">
+                            <a href="dashboard/admin_dashboard.php" class="btn-primary-hero">
                                 Buka Panel Admin &rarr;
                             </a>
                         <?php else: ?>
-                            <a href="user_dashboard.php" class="btn-primary-hero">
+                            <a href="dashboard/user_dashboard.php" class="btn-primary-hero">
                                 Buka Halaman Pengguna &rarr;
                             </a>
                         <?php endif; ?>

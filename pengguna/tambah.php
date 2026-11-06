@@ -1,6 +1,8 @@
 
 <?php
-require_once "../koneksi.php";
+require_once "../includes/auth_check.php";
+require_admin();
+require_once "../includes/koneksi.php";
 
 $error = "";
 
@@ -88,7 +90,7 @@ $data = $_POST ?? [];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Pengguna - SIRAPI</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 
 <body>

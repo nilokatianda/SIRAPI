@@ -1,5 +1,6 @@
 <?php
-require_once "../koneksi.php";
+require_once "../includes/auth_check.php";
+require_once "../includes/koneksi.php";
 $id = isset($_GET["id"]) ? (int)$_GET["id"] : 0;
 $cek = mysqli_prepare($conn, "SELECT id_periode, nama_periode, nama_divisi FROM periode WHERE id_periode = ?");
 mysqli_stmt_bind_param($cek, "i", $id);
@@ -30,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 ?>
 <!DOCTYPE html>
 <html lang="id">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Edit Periode</title><link rel="stylesheet" href="../style.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Edit Periode</title><link rel="stylesheet" href="../assets/css/style.css"></head>
 <body>
     <h1>Edit Data Periode</h1>
     <p><a href="index.php">Kembali</a></p>
