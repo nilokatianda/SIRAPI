@@ -25,6 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $nama_arsip = trim($_POST['nama_arsip'] ?? '');
     $nama_file = trim($_POST['nama_file'] ?? '');
     $tanggal_upload = trim($_POST['tanggal_upload'] ?? '');
+    $jumlah_arsip = isset($_POST['jumlah_arsip']) ? max(1, (int)$_POST['jumlah_arsip']) : 1;
     $id_kegiatan_raw = trim($_POST['id_kegiatan'] ?? '');
 
     $id_kegiatan = (
@@ -118,28 +119,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 $sql = "INSERT INTO arsip
                         (nama_arsip, nama_file, file_arsip,
-                         tanggal_upload, id_kegiatan)
-                        VALUES (?, ?, ?, ?, NULL)";
-
-                $stmt = mysqli_prepare($conn, $sql);
-
-                if ($stmt) {
-                    mysqli_stmt_bind_param(
-                        $stmt,
-                        "ssss",
-                        $nama_arsip,
-                        $nama_file,
-                        $file_arsip,
-                        $tanggal_upload
-                    );
-                }
-
-            } else {
-
-                $sql = "INSERT INTO arsip
-                        (nama_arsip, nama_file, file_arsip,
-                         tanggal_upload, id_kegiatan)
-                        VALUES (?, ?, ?, ?, ?)";
+                         tanggal_upload, jumlah_arsip, id_kegiatan)
+                        VALUES (?, ?, ?, ?, ?, NULL)";
 
                 $stmt = mysqli_prepare($conn, $sql);
 
@@ -151,6 +132,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         $nama_file,
                         $file_arsip,
                         $tanggal_upload,
+                        $jumlah_arsip
+                    );
+                }
+
+            } else {
+
+                $sql = "INSERT INTO arsip
+                        (nama_arsip, nama_file, file_arsip,
+                         tanggal_upload, jumlah_arsip, id_kegiatan)
+                        VALUES (?, ?, ?, ?, ?, ?)";
+
+                $stmt = mysqli_prepare($conn, $sql);
+
+                if ($stmt) {
+                    mysqli_stmt_bind_param(
+                        $stmt,
+                        "ssssii",
+                        $nama_arsip,
+                        $nama_file,
+                        $file_arsip,
+                        $tanggal_upload,
+                        $jumlah_arsip,
                         $id_kegiatan
                     );
                 }
@@ -220,6 +223,17 @@ $data = $_POST;
                 value="<?= htmlspecialchars((string)($data['nama_arsip'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
                 required
             >
+        </label>
+
+        <label>Jumlah Arsip
+            <input
+                type="number"
+                name="jumlah_arsip"
+                min="1"
+                value="<?= htmlspecialchars((string)($data['jumlah_arsip'] ?? 1), ENT_QUOTES, 'UTF-8') ?>"
+                required
+            >
+            <small>Jumlah fisik/eksemplar dokumen yang tersedia.</small>
         </label>
 
         <label>Nama File

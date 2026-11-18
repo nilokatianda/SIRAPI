@@ -17,8 +17,18 @@ if (!$result) {
 <body>
     <h1>Data Kegiatan</h1>
     <p><a href="<?= $dashboard_url ?>" class="btn-kembali">&larr; <?= $dashboard_label ?></a></p>
-    <a class="tombol" href="tambah.php">Tambah Data Kegiatan</a>
-    <table>
+
+    <div class="table-toolbar-bar">
+        <div class="table-toolbar-left">
+            <a class="tombol" href="tambah.php">+ Tambah Data Kegiatan</a>
+        </div>
+        <div class="table-search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="kegiatanSearch" placeholder="Cari nama kegiatan, deskripsi, tanggal..." onkeyup="liveSearchTable('kegiatanSearch', 'kegiatanTable', 'kegiatanCount')">
+        </div>
+    </div>
+
+    <table id="kegiatanTable">
         <thead><tr><th>ID</th><th>Nama Kegiatan</th><th>Deskripsi</th><th>Tanggal Kegiatan</th><th>ID Periode</th><th>Aksi</th></tr></thead>
         <tbody>
         <?php if (mysqli_num_rows($result) > 0): ?>
@@ -36,5 +46,57 @@ if (!$result) {
         <?php endif; ?>
         </tbody>
     </table>
+
+    <script>
+    function liveSearchTable(inputId, tableId, countId) {
+        const input = document.getElementById(inputId);
+        const filter = input.value.toLowerCase().trim();
+        const table = document.getElementById(tableId);
+        const tbody = table.querySelector('tbody');
+        const rows = tbody.querySelectorAll('tr');
+        let visibleCount = 0;
+        let totalCount = 0;
+
+        rows.forEach(row => {
+            if (row.classList.contains('no-result-row')) return;
+            totalCount++;
+
+            const text = row.innerText.toLowerCase();
+            if (filter === '' || text.includes(filter)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        let noResultEl = tbody.querySelector('.no-result-row');
+        if (visibleCount === 0 && totalCount > 0) {
+            if (!noResultEl) {
+                noResultEl = document.createElement('tr');
+                noResultEl.className = 'no-result-row';
+                const colCount = table.querySelectorAll('thead th').length || 6;
+                noResultEl.innerHTML = `<td colspan="${colCount}" style="text-align: center; padding: 24px; color: #94a3b8; font-weight: 600;">🔍 Tidak ditemukan data kegiatan yang sesuai dengan pencarian "${input.value}"</td>`;
+                tbody.appendChild(noResultEl);
+            } else {
+                noResultEl.style.display = '';
+                noResultEl.querySelector('td').innerHTML = `🔍 Tidak ditemukan data kegiatan yang sesuai dengan pencarian "${input.value}"`;
+            }
+        } else if (noResultEl) {
+            noResultEl.style.display = 'none';
+        }
+
+        if (countId) {
+            const countBadge = document.getElementById(countId);
+            if (countBadge) {
+                if (filter === '') {
+                    countBadge.textContent = `Total ${totalCount} Data`;
+                } else {
+                    countBadge.textContent = `Menampilkan ${visibleCount} dari ${totalCount} Data`;
+                }
+            }
+        }
+    }
+    </script>
 </body>
 </html>

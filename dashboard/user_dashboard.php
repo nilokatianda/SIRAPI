@@ -66,10 +66,13 @@ $sql_divisi = "
         COALESCE(p.nama_periode, 'Umum') AS nama_periode,
         COALESCE(p.nama_divisi, 'Umum') AS nama_divisi,
         COUNT(DISTINCT k.id_kegiatan) AS total_kegiatan,
-        COUNT(DISTINCT a.id_arsip) AS total_arsip
+        COUNT(DISTINCT a.id_arsip) AS total_arsip,
+        COALESCE(SUM(a.jumlah_arsip), 0) AS total_jumlah_arsip,
+        COUNT(CASE WHEN pm.status_peminjaman = 'Dipinjam' THEN 1 END) AS total_dipinjam
     FROM periode p
     LEFT JOIN kegiatan k ON p.id_periode = k.id_periode
     LEFT JOIN arsip a ON k.id_kegiatan = a.id_kegiatan
+    LEFT JOIN peminjaman pm ON a.id_arsip = pm.id_arsip
     GROUP BY p.id_periode, p.nama_periode, p.nama_divisi
     ORDER BY p.nama_periode DESC, p.nama_divisi ASC
 ";
@@ -78,17 +81,28 @@ $res_divisi = mysqli_query($conn, $sql_divisi);
 $divisi_list = [];
 $unique_periode = [];
 $grand_total_arsip = 0;
+$grand_total_jumlah_arsip = 0;
+$grand_total_tersedia = 0;
+$grand_total_dipinjam = 0;
 $grand_total_kegiatan = 0;
 
 if ($res_divisi) {
     while ($r = mysqli_fetch_assoc($res_divisi)) {
+        $jml_total = (int)$r['total_jumlah_arsip'];
+        $jml_dipinjam = (int)$r['total_dipinjam'];
+        $jml_tersedia = max(0, $jml_total - $jml_dipinjam);
+        $r['total_tersedia'] = $jml_tersedia;
+
         $divisi_list[] = $r;
         $p_val = $r['nama_periode'];
         if (!isset($unique_periode[$p_val])) {
             $unique_periode[$p_val] = 0;
         }
-        $unique_periode[$p_val] += (int)$r['total_arsip'];
+        $unique_periode[$p_val] += $jml_tersedia;
         $grand_total_arsip += (int)$r['total_arsip'];
+        $grand_total_jumlah_arsip += $jml_total;
+        $grand_total_tersedia += $jml_tersedia;
+        $grand_total_dipinjam += $jml_dipinjam;
         $grand_total_kegiatan += (int)$r['total_kegiatan'];
     }
 }
@@ -892,11 +906,11 @@ if ($res_divisi) {
 
                         <div>
                             <div class="divisi-metrics-row">
-                                <div class="divisi-metric-chip">
+                                <div class="divisi-metric-chip" title="Total Program Kegiatan">
                                     🎯 <strong><?php echo (int)$div['total_kegiatan']; ?></strong> Kegiatan
                                 </div>
-                                <div class="divisi-metric-chip">
-                                    📄 <strong><?php echo (int)$div['total_arsip']; ?></strong> Dokumen
+                                <div class="divisi-metric-chip" title="Jumlah Arsip Siap Dipinjam Saat Ini">
+                                    📄 <strong><?php echo (int)$div['total_tersedia']; ?></strong> / <?php echo (int)$div['total_jumlah_arsip']; ?> Tersedia
                                 </div>
                             </div>
                             <div class="btn-open-divisi">

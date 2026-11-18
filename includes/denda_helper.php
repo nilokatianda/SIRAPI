@@ -6,10 +6,9 @@
  * Aturan Denda:
  * - Tepat Waktu (<= 0 hari): Rp 0 (Bebas Denda)
  * - Terlambat 1 hari: Rp 20.000
- * - Terlambat 2 hari: Rp 22.500
- * - Terlambat 3 hari: Rp 25.000
- * - Terlambat 4 hari: Rp 30.000
- * - Terlambat > 4 hari: Rp 30.000 + ((hari - 4) * Rp 5.000)
+ * - Terlambat 2 hari: Rp 25.000
+ * - Terlambat 3 hari: Rp 30.000
+ * - Terlambat > 3 hari: Rp 30.000 + ((hari - 3) * Rp 5.000)
  */
 
 if (!function_exists('ensure_denda_schema')) {
@@ -76,7 +75,7 @@ if (!function_exists('hitung_hari_terlambat')) {
 if (!function_exists('hitung_nominal_denda')) {
     /**
      * Menghitung nominal denda berdasarkan aturan spesifik:
-     * 1 hari = 20.000 | 2 hari = 22.500 | 3 hari = 25.000 | 4 hari = 30.000 | > 4 hari = +5.000/hari
+     * 1 hari = 20.000 | 2 hari = 25.000 | 3 hari = 30.000 | > 3 hari = +5.000/hari
      */
     function hitung_nominal_denda($hari_terlambat) {
         if ($hari_terlambat <= 0) {
@@ -86,13 +85,10 @@ if (!function_exists('hitung_nominal_denda')) {
             return 20000;
         }
         if ($hari_terlambat === 2) {
-            return 22500;
-        }
-        if ($hari_terlambat === 3) {
             return 25000;
         }
-        // 4 hari ke atas: 30.000 + 5.000 per hari tambahan
-        return 30000 + (($hari_terlambat - 4) * 5000);
+        // 3 hari ke atas: 30.000 + 5.000 per hari tambahan
+        return 30000 + (($hari_terlambat - 3) * 5000);
     }
 }
 

@@ -9,7 +9,7 @@ $id = isset($_GET["id"]) ? (int)$_GET["id"] : 0;
 $cek = mysqli_prepare(
     $conn,
     "SELECT id_arsip, nama_arsip, nama_file,
-            file_arsip, tanggal_upload, id_kegiatan
+            file_arsip, tanggal_upload, id_kegiatan, jumlah_arsip
      FROM arsip
      WHERE id_arsip = ?"
 );
@@ -47,6 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $nama_arsip = trim($_POST['nama_arsip'] ?? '');
     $nama_file = trim($_POST['nama_file'] ?? '');
     $tanggal_upload = trim($_POST['tanggal_upload'] ?? '');
+    $jumlah_arsip = isset($_POST['jumlah_arsip']) ? max(1, (int)$_POST['jumlah_arsip']) : 1;
     $id_kegiatan_raw = trim($_POST['id_kegiatan'] ?? '');
 
     $id_kegiatan = (
@@ -144,31 +145,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             nama_file = ?,
                             file_arsip = ?,
                             tanggal_upload = ?,
+                            jumlah_arsip = ?,
                             id_kegiatan = NULL
-                        WHERE id_arsip = ?";
-
-                $stmt = mysqli_prepare($conn, $sql);
-
-                if ($stmt) {
-                    mysqli_stmt_bind_param(
-                        $stmt,
-                        "ssssi",
-                        $nama_arsip,
-                        $nama_file,
-                        $file_arsip,
-                        $tanggal_upload,
-                        $id
-                    );
-                }
-
-            } else {
-
-                $sql = "UPDATE arsip SET
-                            nama_arsip = ?,
-                            nama_file = ?,
-                            file_arsip = ?,
-                            tanggal_upload = ?,
-                            id_kegiatan = ?
                         WHERE id_arsip = ?";
 
                 $stmt = mysqli_prepare($conn, $sql);
@@ -181,6 +159,33 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         $nama_file,
                         $file_arsip,
                         $tanggal_upload,
+                        $jumlah_arsip,
+                        $id
+                    );
+                }
+
+            } else {
+
+                $sql = "UPDATE arsip SET
+                            nama_arsip = ?,
+                            nama_file = ?,
+                            file_arsip = ?,
+                            tanggal_upload = ?,
+                            jumlah_arsip = ?,
+                            id_kegiatan = ?
+                        WHERE id_arsip = ?";
+
+                $stmt = mysqli_prepare($conn, $sql);
+
+                if ($stmt) {
+                    mysqli_stmt_bind_param(
+                        $stmt,
+                        "ssssiii",
+                        $nama_arsip,
+                        $nama_file,
+                        $file_arsip,
+                        $tanggal_upload,
+                        $jumlah_arsip,
                         $id_kegiatan,
                         $id
                     );
@@ -263,6 +268,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 value="<?= htmlspecialchars((string)($data['nama_arsip'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
                 required
             >
+        </label>
+
+        <label>Jumlah Arsip
+            <input
+                type="number"
+                name="jumlah_arsip"
+                min="1"
+                value="<?= htmlspecialchars((string)($data['jumlah_arsip'] ?? 1), ENT_QUOTES, 'UTF-8') ?>"
+                required
+            >
+            <small>Jumlah fisik/eksemplar dokumen yang tersedia.</small>
         </label>
 
         <label>Nama File

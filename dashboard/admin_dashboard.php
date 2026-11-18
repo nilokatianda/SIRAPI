@@ -14,12 +14,16 @@ $pesan_sukses = "";
 $pesan_error = "";
 
 // Hitung Statistik Lengkap untuk 6 Stat Cards
-$count_arsip = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM arsip"))['total'] ?? 0;
+$q_arsip_stat = mysqli_query($conn, "SELECT COUNT(*) as total_judul, COALESCE(SUM(jumlah_arsip), 0) as total_fisik FROM arsip");
+$row_arsip_stat = mysqli_fetch_assoc($q_arsip_stat);
+$count_arsip = $row_arsip_stat['total_judul'] ?? 0;
+$total_jumlah_arsip = $row_arsip_stat['total_fisik'] ?? 0;
 $count_pengguna = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pengguna"))['total'] ?? 0;
 $count_periode = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM periode"))['total'] ?? 0;
 $count_kegiatan = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM kegiatan"))['total'] ?? 0;
 $count_aktif = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM peminjaman WHERE status_peminjaman = 'Dipinjam'"))['total'] ?? 0;
 $count_kembali = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM peminjaman WHERE status_peminjaman = 'Dikembalikan'"))['total'] ?? 0;
+$count_tersedia = max(0, $total_jumlah_arsip - $count_aktif);
 
 // Hitung total denda tertunggak secara dinamis
 $q_all_tx = mysqli_query($conn, "SELECT id_peminjaman, tanggal_kembali, tanggal_dikembalikan, status_peminjaman, denda, status_denda FROM peminjaman");
@@ -78,11 +82,11 @@ if ($q_all_tx) {
             font-size: 13px;
         }
 
-        /* SIDEBAR KIRI */
+        /* SIDEBAR KIRI ADMIN (SELARAS DENGAN NATURE EMERALD DASHBOARD PENGGUNA) */
         .sidebar {
             width: var(--sidebar-w);
-            background: #ffffff;
-            border-right: 1px solid var(--border-color);
+            background: linear-gradient(180deg, #064e3b 0%, #047857 60%, #022c22 100%);
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             position: sticky;
@@ -90,54 +94,61 @@ if ($q_all_tx) {
             height: 100vh;
             flex-shrink: 0;
             z-index: 40;
-            padding: 24px 18px;
+            padding: 24px 16px;
+            box-shadow: 4px 0 24px rgba(6, 78, 59, 0.15);
+            border-right: none;
         }
 
         .sidebar-brand {
             display: flex;
             align-items: center;
             gap: 12px;
+            padding: 0 8px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            margin-bottom: 20px;
             text-decoration: none;
-            color: var(--text-main);
-            margin-bottom: 28px;
-            padding: 0 6px;
+            color: #ffffff;
         }
 
         .sidebar-logo {
             width: 42px;
             height: 42px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
             border-radius: 12px;
-            background: linear-gradient(135deg, #047857 0%, #064e3b 100%);
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.25);
             color: #ffffff;
-            box-shadow: 0 4px 12px rgba(4, 120, 87, 0.25);
+            box-shadow: none;
             flex-shrink: 0;
         }
 
         .sidebar-title h2 {
-            font-size: 17px;
+            font-size: 18px;
             font-weight: 800;
             letter-spacing: -0.5px;
             line-height: 1.1;
-            color: #0f172a;
+            color: #ffffff;
         }
 
         .sidebar-title p {
-            font-size: 11px;
-            color: var(--text-muted);
+            font-size: 10.5px;
+            color: #a7f3d0;
+            margin-top: 3px;
+            font-weight: 500;
             line-height: 1.3;
         }
 
         .menu-section-label {
-            font-size: 10.5px;
+            font-size: 10px;
             font-weight: 700;
-            color: #94a3b8;
+            color: #6ee7b7;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
-            padding: 10px 10px 4px;
-            margin-top: 6px;
+            letter-spacing: 0.8px;
+            padding: 12px 12px 4px;
+            margin-top: 4px;
         }
 
         .sidebar-menu {
@@ -151,50 +162,66 @@ if ($q_all_tx) {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 9px 12px;
+            padding: 9.5px 14px;
             border-radius: 10px;
             text-decoration: none;
             font-size: 12.5px;
             font-weight: 600;
-            color: #475569;
+            color: #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-menu a svg {
+            color: #a7f3d0;
             transition: all 0.2s ease;
         }
 
         .sidebar-menu a:hover {
-            background: #f1f5f9;
-            color: var(--primary);
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            transform: translateX(3px);
+        }
+
+        .sidebar-menu a:hover svg {
+            color: #ffffff;
         }
 
         .sidebar-menu a.active {
-            background: var(--primary-soft);
-            color: var(--primary);
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
             font-weight: 700;
-            border: 1px solid var(--primary-border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-menu a.active svg {
+            color: #ffffff;
         }
 
         .sidebar-footer {
             margin-top: auto;
             padding-top: 16px;
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
         }
 
         .btn-sidebar-logout {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 9px 12px;
+            padding: 10px 14px;
             border-radius: 10px;
-            color: #dc2626;
+            color: #fecaca;
             text-decoration: none;
             font-weight: 700;
             font-size: 12px;
-            background: #fef2f2;
-            border: 1px solid #fee2e2;
+            background: rgba(220, 38, 38, 0.18);
+            border: 1px solid rgba(248, 113, 113, 0.35);
             transition: all 0.2s;
         }
 
         .btn-sidebar-logout:hover {
-            background: #fee2e2;
+            background: rgba(220, 38, 38, 0.35);
+            color: #ffffff;
             transform: translateX(2px);
         }
 
@@ -387,12 +414,24 @@ if ($q_all_tx) {
             background: rgba(255, 255, 255, 0.25);
         }
 
-        /* 6 STAT CARDS */
+        /* 6 STAT CARDS (3 DI ATAS & 3 DI BAWAH) */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
             margin-bottom: 28px;
+        }
+
+        @media (max-width: 992px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .stat-card {
@@ -406,12 +445,15 @@ if ($q_all_tx) {
             justify-content: space-between;
             transition: all 0.2s ease;
             position: relative;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
         }
 
         .stat-card:hover {
             transform: translateY(-3px);
             box-shadow: var(--shadow-card);
-            border-color: #cbd5e1;
+            border-color: var(--primary-border);
         }
 
         .stat-top {
@@ -864,7 +906,7 @@ if ($q_all_tx) {
             <li>
                 <a href="../kegiatan/index.php">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    Kegiatan Divisi
+                    Kegiatan
                 </a>
             </li>
             <li>
@@ -887,6 +929,12 @@ if ($q_all_tx) {
                 <a href="../peminjaman/index.php">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                     Sirkulasi & Monitoring Denda
+                </a>
+            </li>
+            <li>
+                <a href="pengeluaran.php">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Biaya Pemeliharaan & IT
                 </a>
             </li>
             <li>
@@ -953,30 +1001,30 @@ if ($q_all_tx) {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                         Sirkulasi & Monitoring Denda
                     </a>
-                    <a href="../arsip/tambah.php" class="btn-banner-secondary">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        Upload Arsip Baru
+                    <a href="pengeluaran.php" class="btn-banner-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        Biaya Pemeliharaan IT
                     </a>
                 </div>
             </div>
         </section>
 
-        <!-- 6 KARTU STATISTIK -->
+        <!-- 6 KARTU STATISTIK (LINK AKTIF MENUJU MODUL MASING-MASING) -->
         <section class="stats-grid">
             <!-- 1. Total Arsip -->
-            <div class="stat-card">
+            <a href="../arsip/index.php" class="stat-card" title="Klik untuk membuka Katalog Arsip">
                 <div class="stat-top">
                     <span class="stat-title">Total Arsip</span>
                     <div class="stat-icon-wrap emerald">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
                     </div>
                 </div>
-                <div class="stat-number"><?php echo $count_arsip; ?></div>
-                <div class="stat-subtext">Berkas fisik & digital</div>
-            </div>
+                <div class="stat-number"><?php echo $count_tersedia; ?> <span style="font-size: 13px; font-weight: 700; color: #10b981;">Tersedia</span></div>
+                <div class="stat-subtext">Dari total <strong><?php echo $total_jumlah_arsip; ?></strong> fisik (<?php echo $count_aktif; ?> dipinjam)</div>
+            </a>
 
             <!-- 2. Total Pengguna -->
-            <div class="stat-card">
+            <a href="../pengguna/index.php" class="stat-card" title="Klik untuk mengelola Akun Pengguna">
                 <div class="stat-top">
                     <span class="stat-title">Pengguna Terdaftar</span>
                     <div class="stat-icon-wrap blue">
@@ -985,10 +1033,10 @@ if ($q_all_tx) {
                 </div>
                 <div class="stat-number"><?php echo $count_pengguna; ?></div>
                 <div class="stat-subtext">Akun anggota & staff</div>
-            </div>
+            </a>
 
             <!-- 3. Periode & Divisi -->
-            <div class="stat-card">
+            <a href="../periode/index.php" class="stat-card" title="Klik untuk mengelola Periode & Divisi">
                 <div class="stat-top">
                     <span class="stat-title">Periode & Divisi</span>
                     <div class="stat-icon-wrap indigo">
@@ -997,10 +1045,10 @@ if ($q_all_tx) {
                 </div>
                 <div class="stat-number"><?php echo $count_periode; ?></div>
                 <div class="stat-subtext">Unit kepengurusan</div>
-            </div>
+            </a>
 
             <!-- 4. Total Kegiatan -->
-            <div class="stat-card">
+            <a href="../kegiatan/index.php" class="stat-card" title="Klik untuk mengelola Kegiatan & Proker Divisi">
                 <div class="stat-top">
                     <span class="stat-title">Total Kegiatan</span>
                     <div class="stat-icon-wrap purple">
@@ -1009,10 +1057,10 @@ if ($q_all_tx) {
                 </div>
                 <div class="stat-number"><?php echo $count_kegiatan; ?></div>
                 <div class="stat-subtext">Program kerja divisi</div>
-            </div>
+            </a>
 
             <!-- 5. Sedang Dipinjam -->
-            <div class="stat-card">
+            <a href="../peminjaman/index.php" class="stat-card" title="Klik untuk monitoring Peminjaman & Sirkulasi">
                 <div class="stat-top">
                     <span class="stat-title">Sedang Dipinjam</span>
                     <div class="stat-icon-wrap amber">
@@ -1021,10 +1069,10 @@ if ($q_all_tx) {
                 </div>
                 <div class="stat-number"><?php echo $count_aktif; ?></div>
                 <div class="stat-subtext">Arsip di luar kantor</div>
-            </div>
+            </a>
 
             <!-- 6. Denda Tertunggak -->
-            <div class="stat-card <?php echo $total_denda_tertunggak > 0 ? 'alert-card' : ''; ?>">
+            <a href="../peminjaman/index.php" class="stat-card <?php echo $total_denda_tertunggak > 0 ? 'alert-card' : ''; ?>" title="Klik untuk monitoring Tagihan Denda & Pembayaran">
                 <div class="stat-top">
                     <span class="stat-title">Denda Tertunggak</span>
                     <div class="stat-icon-wrap rose">
@@ -1037,7 +1085,7 @@ if ($q_all_tx) {
                 <div class="stat-subtext">
                     <?php echo $total_denda_tertunggak > 0 ? '⚠️ ' . $count_telat_aktif . ' transaksi telat' : 'Semua transaksi lancar'; ?>
                 </div>
-            </div>
+            </a>
         </section>
 
     </main>

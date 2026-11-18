@@ -1,0 +1,310 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1480" width="100%" height="100%" style="background:#f8fafc; font-family:'Plus Jakarta Sans', -apple-system, sans-serif;">
+  <defs>
+    <!-- Filter Drop Shadow -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+    <filter id="shadow-card" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#047857" flood-opacity="0.06" />
+    </filter>
+
+    <!-- Marker Arrowheads -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#047857" />
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#dc2626" />
+    </marker>
+    <marker id="arrow-slate" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#64748b" />
+    </marker>
+
+    <!-- Linear Gradients -->
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b" />
+      <stop offset="70%" stop-color="#047857" />
+      <stop offset="100%" stop-color="#0f766e" />
+    </linearGradient>
+
+    <linearGradient id="startGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#047857" />
+      <stop offset="100%" stop-color="#065f46" />
+    </linearGradient>
+
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f8fafc" />
+    </linearGradient>
+  </defs>
+
+  <!-- HEADER BANNER -->
+  <g transform="translate(40, 30)">
+    <rect width="1020" height="95" rx="16" fill="url(#headerGrad)" filter="url(#shadow)" />
+    <circle cx="50" cy="48" r="24" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" />
+    <text x="50" y="55" font-size="22" text-anchor="middle" fill="#ffffff">🏛️</text>
+    <text x="90" y="44" font-size="20" font-weight="800" fill="#ffffff" letter-spacing="-0.3">FLOWCHART SISTEM SIRAPI — PERAN ADMINISTRATOR</text>
+    <text x="90" y="68" font-size="12.5" font-weight="500" fill="#a7f3d0">Alur Kerja Hak Akses Penuh: Otentikasi, Data Master, Sirkulasi & Denda QRIS, serta Pemeliharaan IT</text>
+    <rect x="910" y="32" width="85" height="30" rx="15" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+    <text x="952" y="52" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">ROLE: ADMIN</text>
+  </g>
+
+  <!-- ==================== BAGIAN 1: OTENTIKASI & VALIDASI ==================== -->
+  <!-- 1. START -->
+  <g transform="translate(460, 160)">
+    <rect width="180" height="46" rx="23" fill="url(#startGrad)" filter="url(#shadow)" />
+    <text x="90" y="29" font-size="13" font-weight="800" fill="#ffffff" text-anchor="middle">1. MULAI (START)</text>
+  </g>
+
+  <!-- Line 1 to 2 -->
+  <line x1="550" y1="206" x2="550" y2="236" stroke="#047857" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- 2. INPUT KREDENSIAL -->
+  <g transform="translate(430, 240)">
+    <!-- Parallelogram (Input) -->
+    <polygon points="20,0 240,0 220,50 0,50" fill="#ffffff" stroke="#047857" stroke-width="2" filter="url(#shadow)" />
+    <text x="120" y="23" font-size="12" font-weight="700" fill="#0f172a" text-anchor="middle">2. Input Login Admin</text>
+    <text x="120" y="40" font-size="10.5" fill="#64748b" text-anchor="middle">Username & Password (auth/login.php)</text>
+  </g>
+
+  <!-- Line 2 to 3 -->
+  <line x1="550" y1="290" x2="550" y2="320" stroke="#047857" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- 3. DECISION: VALIDASI LOGIN & ROLE ADMIN -->
+  <g transform="translate(435, 325)">
+    <!-- Diamond -->
+    <polygon points="115,0 230,55 115,110 0,55" fill="#ffffff" stroke="#047857" stroke-width="2" filter="url(#shadow)" />
+    <text x="115" y="48" font-size="11.5" font-weight="800" fill="#064e3b" text-anchor="middle">3. Kredensial Valid</text>
+    <text x="115" y="65" font-size="11" font-weight="700" fill="#064e3b" text-anchor="middle">& Role == 'admin'?</text>
+  </g>
+
+  <!-- Gagal Login (Ke Kiri) -->
+  <path d="M 435 380 L 250 380" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-red)" />
+  <text x="340" y="372" font-size="11" font-weight="700" fill="#dc2626">TIDAK (Validasi Gagal)</text>
+
+  <g transform="translate(70, 355)">
+    <rect width="180" height="50" rx="8" fill="#fef2f2" stroke="#fecaca" stroke-width="1.5" filter="url(#shadow)" />
+    <text x="90" y="22" font-size="11" font-weight="700" fill="#991b1b" text-anchor="middle">Tampilkan Notifikasi Error</text>
+    <text x="90" y="38" font-size="9.5" fill="#dc2626" text-anchor="middle">Sesi Ditolak / Akses Diblokir</text>
+  </g>
+  <!-- Loop back to login -->
+  <path d="M 160 355 L 160 265 L 420 265" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow-red)" />
+
+  <!-- Sukses Login (Ke Bawah) -->
+  <line x1="550" y1="435" x2="550" y2="475" stroke="#047857" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="558" y="458" font-size="11" font-weight="800" fill="#047857">YA (Tervalidasi)</text>
+
+  <!-- 4. DASHBOARD ADMIN -->
+  <g transform="translate(380, 480)">
+    <rect width="340" height="66" rx="12" fill="url(#cardGrad)" stroke="#047857" stroke-width="2" filter="url(#shadow)" />
+    <rect x="0" y="0" width="8" height="66" rx="4" fill="#047857" />
+    <text x="175" y="28" font-size="13" font-weight="800" fill="#064e3b" text-anchor="middle">4. Masuk Dashboard Administrator</text>
+    <text x="175" y="48" font-size="10.5" fill="#475569" text-anchor="middle">Inisialisasi Session Admin • Tampilkan Ringkasan 6 Kartu Statistik (3x2)</text>
+  </g>
+
+  <!-- Line 4 to Branching Bus -->
+  <line x1="550" y1="546" x2="550" y2="585" stroke="#047857" stroke-width="2" />
+  <!-- Horizontal Bus -->
+  <line x1="180" y1="585" x2="920" y2="585" stroke="#047857" stroke-width="2" />
+
+  <!-- Connector Down to Branch A -->
+  <line x1="180" y1="585" x2="180" y2="615" stroke="#047857" stroke-width="2" marker-end="url(#arrow)" />
+  <!-- Connector Down to Branch B -->
+  <line x1="550" y1="585" x2="550" y2="615" stroke="#047857" stroke-width="2" marker-end="url(#arrow)" />
+  <!-- Connector Down to Branch C -->
+  <line x1="920" y1="585" x2="920" y2="615" stroke="#047857" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- ==================== BAGIAN 2: CABANG 3 MODUL UTAMA ==================== -->
+
+  <!-- PILAR A: KELOLA DATA MASTER (Kiri) -->
+  <g transform="translate(50, 620)">
+    <!-- Container Box -->
+    <rect width="260" height="430" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4" />
+    <rect x="20" y="-12" width="170" height="24" rx="6" fill="#047857" />
+    <text x="105" y="4" font-size="11" font-weight="800" fill="#ffffff" text-anchor="middle">A. KELOLA DATA MASTER</text>
+
+    <!-- Sub 1: Katalog Arsip -->
+    <g transform="translate(15, 25)">
+      <rect width="230" height="68" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+      <text x="115" y="24" font-size="11.5" font-weight="700" fill="#0f172a" text-anchor="middle">Katalog Master Arsip</text>
+      <text x="115" y="42" font-size="9.5" fill="#64748b" text-anchor="middle">CRUD Berkas, Upload PDF/Dokumen,</text>
+      <text x="115" y="56" font-size="9.5" fill="#047857" font-weight="600" text-anchor="middle">Input & Sync Jumlah Eksemplar Fisik</text>
+    </g>
+
+    <!-- Sub 2: Kegiatan Divisi -->
+    <g transform="translate(15, 105)">
+      <rect width="230" height="60" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+      <text x="115" y="24" font-size="11.5" font-weight="700" fill="#0f172a" text-anchor="middle">Program Kerja & Kegiatan</text>
+      <text x="115" y="44" font-size="9.5" fill="#64748b" text-anchor="middle">Relasi Periode Kepengurusan & Proker</text>
+    </g>
+
+    <!-- Sub 3: Periode & Divisi -->
+    <g transform="translate(15, 177)">
+      <rect width="230" height="60" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+      <text x="115" y="24" font-size="11.5" font-weight="700" fill="#0f172a" text-anchor="middle">Periode & Divisi UKM</text>
+      <text x="115" y="44" font-size="9.5" fill="#64748b" text-anchor="middle">Kelola Tahun Jabatan & Unit Divisi</text>
+    </g>
+
+    <!-- Sub 4: Akun Pengguna -->
+    <g transform="translate(15, 249)">
+      <rect width="230" height="60" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+      <text x="115" y="24" font-size="11.5" font-weight="700" fill="#0f172a" text-anchor="middle">Manajemen Akun Pengguna</text>
+      <text x="115" y="44" font-size="9.5" fill="#64748b" text-anchor="middle">Role Admin vs Anggota, Reset Akses</text>
+    </g>
+
+    <!-- Live Search & Toolbar Feature -->
+    <g transform="translate(15, 321)">
+      <rect width="230" height="50" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.5" />
+      <text x="115" y="22" font-size="10.5" font-weight="700" fill="#065f46" text-anchor="middle">🔍 Live Search Tanpa Reload</text>
+      <text x="115" y="38" font-size="9" fill="#047857" text-anchor="middle">Pencarian Instan Sisi Klien di Semua Modul</text>
+    </g>
+    
+    <text x="130" y="405" font-size="9.5" font-weight="700" fill="#047857" text-anchor="middle">Integritas Basis Data MySQL (sirapi) ➔</text>
+  </g>
+
+  <!-- PILAR B: SIRKULASI, DENDA & STRUK (Tengah) -->
+  <g transform="translate(360, 620)">
+    <!-- Container Box -->
+    <rect width="380" height="430" rx="14" fill="#ffffff" stroke="#047857" stroke-width="2" filter="url(#shadow-card)" />
+    <rect x="25" y="-12" width="220" height="24" rx="6" fill="#047857" />
+    <text x="135" y="4" font-size="11" font-weight="800" fill="#ffffff" text-anchor="middle">B. SIRKULASI & MONITORING DENDA</text>
+
+    <!-- Sub 1: Form Pinjam Cepat -->
+    <g transform="translate(20, 25)">
+      <rect width="340" height="66" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+      <text x="170" y="22" font-size="11.5" font-weight="700" fill="#0f172a" text-anchor="middle">Catat Peminjaman Cepat</text>
+      <text x="170" y="40" font-size="9.5" fill="#64748b" text-anchor="middle">Pilih Dokumen & Anggota • Tanggal Otomatis +5 Hari</text>
+      <text x="170" y="54" font-size="9.5" fill="#059669" font-weight="700" text-anchor="middle">Stok Tersedia Terpotong Otomatis Secara Real-Time</text>
+    </g>
+
+    <!-- Sub 2: Struk Bukti Peminjaman -->
+    <g transform="translate(20, 103)">
+      <rect width="340" height="52" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5" />
+      <text x="170" y="22" font-size="11.5" font-weight="700" fill="#065f46" text-anchor="middle">🧾 Cetak Struk Bukti Pinjam (cetak_struk.php)</text>
+      <text x="170" y="40" font-size="9.5" fill="#047857" text-anchor="middle">Format Slip Kasir & A5/A4 Bersertifikasi Sistem Otomatis</text>
+    </g>
+
+    <!-- Sub 3: Monitoring & Denda Bertingkat -->
+    <g transform="translate(20, 167)">
+      <rect width="340" height="74" rx="8" fill="#fffbeb" stroke="#fde68a" stroke-width="1.5" />
+      <text x="170" y="20" font-size="11.5" font-weight="800" fill="#92400e" text-anchor="middle">Kalkulasi Denda Bertingkat Dinamis</text>
+      <text x="170" y="38" font-size="9.5" fill="#b45309" text-anchor="middle">H1: Rp20.000 • H2: Rp25.000 • H3: Rp30.000</text>
+      <text x="170" y="52" font-size="9.5" fill="#b45309" text-anchor="middle">> H3: Rp30.000 + (Hari - 3) × Rp5.000 / Hari</text>
+      <text x="170" y="66" font-size="9" font-weight="700" fill="#d97706" text-anchor="middle">Batas Waktu: Hari ke-6 Otomatis Dihitung Telat</text>
+    </g>
+
+    <!-- Sub 4: Verifikasi QRIS / E-Wallet -->
+    <g transform="translate(20, 253)">
+      <rect width="340" height="60" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+      <text x="170" y="22" font-size="11.5" font-weight="700" fill="#0f172a" text-anchor="middle">Verifikasi Pembayaran Denda Digital</text>
+      <text x="170" y="40" font-size="9.5" fill="#64748b" text-anchor="middle">Periksa Bukti Bayar QRIS / E-Wallet (GoPay, OVO, DANA)</text>
+      <text x="170" y="52" font-size="9.5" fill="#15803d" font-weight="700" text-anchor="middle">Ubah Status Denda Menjadi 'Lunas'</text>
+    </g>
+
+    <!-- Sub 5: Pengembalian Berkas -->
+    <g transform="translate(20, 325)">
+      <rect width="340" height="50" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+      <text x="170" y="22" font-size="11.5" font-weight="700" fill="#0f172a" text-anchor="middle">Konfirmasi Pengembalian Berkas Fisik</text>
+      <text x="170" y="38" font-size="9.5" fill="#047857" font-weight="600" text-anchor="middle">Status 'Dikembalikan' & Stok Tersedia Bertambah Kembali</text>
+    </g>
+
+    <!-- Sub 6: Diagram Tren Chart.js -->
+    <g transform="translate(20, 385)">
+      <text x="170" y="16" font-size="10" font-weight="700" fill="#64748b" text-anchor="middle">📊 Visualisasi Tren Transaksi Chart.js & Filter Waktu</text>
+    </g>
+  </g>
+
+  <!-- PILAR C: PEMELIHARAAN WEBSITE & IT (Kanan) -->
+  <g transform="translate(790, 620)">
+    <!-- Container Box -->
+    <rect width="260" height="430" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6,4" />
+    <rect x="20" y="-12" width="180" height="24" rx="6" fill="#047857" />
+    <text x="110" y="4" font-size="11" font-weight="800" fill="#ffffff" text-anchor="middle">C. PEMELIHARAAN IT (BIAYA)</text>
+
+    <!-- Sub 1: Form Catat Biaya -->
+    <g transform="translate(15, 25)">
+      <rect width="230" height="74" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+      <text x="115" y="22" font-size="11.5" font-weight="700" fill="#0f172a" text-anchor="middle">Catat Biaya Pemeliharaan</text>
+      <text x="115" y="40" font-size="9.5" fill="#64748b" text-anchor="middle">Tampilan Terpusat Ala G-Form</text>
+      <text x="115" y="54" font-size="9.5" fill="#64748b" text-anchor="middle">Kategori: Cloud PDF, Recovery DB,</text>
+      <text x="115" y="67" font-size="9.5" fill="#047857" font-weight="600" text-anchor="middle">Siklus: Bulanan & Insidental</text>
+    </g>
+
+    <!-- Sub 2: Arus Kas Finansial -->
+    <g transform="translate(15, 112)">
+      <rect width="230" height="68" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+      <text x="115" y="22" font-size="11.5" font-weight="700" fill="#0f172a" text-anchor="middle">Monitoring Arus Kas Bersih</text>
+      <text x="115" y="40" font-size="9.5" fill="#059669" font-weight="700" text-anchor="middle">Kas Masuk (Denda Lunas)</text>
+      <text x="115" y="54" font-size="9.5" fill="#dc2626" font-weight="700" text-anchor="middle">- Biaya Pemeliharaan IT</text>
+      <text x="115" y="66" font-size="9.5" fill="#2563eb" font-weight="800" text-anchor="middle">= Saldo Kas Operasional (Net)</text>
+    </g>
+
+    <!-- Sub 3: Ekspor PDF Laporan Resmi -->
+    <g transform="translate(15, 192)">
+      <rect width="230" height="60" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.5" />
+      <text x="115" y="22" font-size="11.5" font-weight="700" fill="#065f46" text-anchor="middle">📄 Ekspor Laporan PDF Resmi</text>
+      <text x="115" y="40" font-size="9.5" fill="#047857" text-anchor="middle">Format Kop Surat Resmi SIRAPI</text>
+      <text x="115" y="52" font-size="9.5" fill="#047857" text-anchor="middle">& Kolom Tanda Tangan Pengesahan</text>
+    </g>
+
+    <!-- Sub 4: Ekspor CSV Excel -->
+    <g transform="translate(15, 264)">
+      <rect width="230" height="54" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+      <text x="115" y="22" font-size="11.5" font-weight="700" fill="#0f172a" text-anchor="middle">📊 Ekspor CSV Spreadsheet</text>
+      <text x="115" y="40" font-size="9.5" fill="#64748b" text-anchor="middle">Standar UTF-8 BOM untuk Excel</text>
+    </g>
+
+    <!-- Tab Navigation Feature -->
+    <g transform="translate(15, 330)">
+      <rect width="230" height="50" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+      <text x="115" y="22" font-size="10.5" font-weight="700" fill="#0f172a" text-anchor="middle">Tab Switcher Navigasi</text>
+      <text x="115" y="38" font-size="9" fill="#64748b" text-anchor="middle">[ Riwayat ] vs [ Form Pengajuan ]</text>
+    </g>
+    
+    <text x="130" y="405" font-size="9.5" font-weight="700" fill="#047857" text-anchor="middle">Transparansi Finansial UKM</text>
+  </g>
+
+  <!-- ==================== BAGIAN 3: DATABASE & SELESAI ==================== -->
+  <!-- Line from 3 branches to Database Bus -->
+  <line x1="180" y1="1050" x2="180" y2="1090" stroke="#047857" stroke-width="2" />
+  <line x1="550" y1="1050" x2="550" y2="1090" stroke="#047857" stroke-width="2" />
+  <line x1="920" y1="1050" x2="920" y2="1090" stroke="#047857" stroke-width="2" />
+
+  <line x1="180" y1="1090" x2="920" y2="1090" stroke="#047857" stroke-width="2" />
+  <line x1="550" y1="1090" x2="550" y2="1120" stroke="#047857" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- 5. DATABASE SYNCHRONIZATION -->
+  <g transform="translate(390, 1125)">
+    <!-- Database Cylinder Symbol -->
+    <rect width="320" height="60" rx="10" fill="#ffffff" stroke="#047857" stroke-width="2" filter="url(#shadow)" />
+    <text x="160" y="26" font-size="12.5" font-weight="800" fill="#064e3b" text-anchor="middle">💾 Sinkronisasi Database MySQL (sirapi)</text>
+    <text x="160" y="46" font-size="10" fill="#64748b" text-anchor="middle">Prepared Statements • Integritas Relasi Foreign Key • Real-Time Stock</text>
+  </g>
+
+  <!-- Line 5 to Logout Decision -->
+  <line x1="550" y1="1185" x2="550" y2="1225" stroke="#047857" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- 6. DECISION: LOGOUT? -->
+  <g transform="translate(450, 1230)">
+    <polygon points="100,0 200,45 100,90 0,45" fill="#ffffff" stroke="#047857" stroke-width="2" filter="url(#shadow)" />
+    <text x="100" y="42" font-size="12" font-weight="800" fill="#0f172a" text-anchor="middle">Selesai /</text>
+    <text x="100" y="58" font-size="12" font-weight="800" fill="#0f172a" text-anchor="middle">Logout?</text>
+  </g>
+
+  <!-- Tidak Logout (Loop kembali ke Dashboard) -->
+  <path d="M 650 1275 L 1070 1275 L 1070 513 L 720 513" stroke="#64748b" stroke-width="1.8" stroke-dasharray="5,4" marker-end="url(#arrow-slate)" fill="none" />
+  <text x="860" y="1268" font-size="11" font-weight="700" fill="#64748b">TIDAK (Lanjut Kelola Modul)</text>
+
+  <!-- Ya Logout (Ke Bawah) -->
+  <line x1="550" y1="1320" x2="550" y2="1355" stroke="#047857" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="560" y="1342" font-size="11" font-weight="800" fill="#047857">YA</text>
+
+  <!-- 7. DESTROY SESSION & END -->
+  <g transform="translate(420, 1360)">
+    <rect width="260" height="52" rx="26" fill="url(#startGrad)" filter="url(#shadow)" />
+    <text x="130" y="24" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">7. Hancurkan Sesi (Logout)</text>
+    <text x="130" y="40" font-size="10" fill="#a7f3d0" text-anchor="middle">SELESAI (auth/logout.php ➔ Login)</text>
+  </g>
+
+  <!-- FOOTER BRANDING -->
+  <text x="550" y="1455" font-size="11" font-weight="600" fill="#94a3b8" text-anchor="middle">Dokumentasi Arsitektur Alur Kerja Sistem Informasi Rekap Arsip & Peminjaman (SIRAPI) © 2026</text>
+</svg>

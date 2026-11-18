@@ -58,8 +58,9 @@ c:\xampp\htdocs\SIRAPI\
 │
 ├── dashboard/                # Modul Pusat Antarmuka Kerja Utama
 │   ├── admin_dashboard.php   # Dashboard Administrator (Statistik, Management Hub, Monitoring & Peminjaman)
+│   ├── pengeluaran.php       # Modul Biaya Pemeliharaan & Operasional IT (Maintenance Website, Neraca Kas, Unduh PDF/CSV)
 │   ├── user_dashboard.php    # Dashboard Pengguna (Statistik Ringkas & Direktori Kartu Divisi)
-│   └── divisi_detail.php     # Halaman Khusus Eksplorasi Kegiatan & Dokumen per Divisi
+│   └── divisi_detail.php     # Halaman Detail Divisi (Card Grid Arsip Inventaris, Filter Tab Tersedia/Dipinjam, Live Stock)
 │
 ├── includes/                 # Logika & Helper Terpusat Backend
 │   ├── koneksi.php           # Konfigurasi koneksi basis data MySQLi terpusat
@@ -67,31 +68,32 @@ c:\xampp\htdocs\SIRAPI\
 │   └── denda_helper.php      # Helper modul denda bertingkat & modal QRIS / E-Wallet interaktif
 │
 ├── arsip/                    # Modul Pengelolaan Data Arsip
-│   ├── index.php             # Tabel daftar arsip
+│   ├── index.php             # Tabel daftar arsip (Live Search & filter ketersediaan stok fisik)
 │   ├── tambah.php            # Form upload & tambah data arsip
 │   ├── edit.php              # Form edit informasi arsip
 │   └── hapus.php             # Handler hapus data arsip
 │
 ├── kegiatan/                 # Modul Pengelolaan Kegiatan / Program Kerja
-│   ├── index.php             # Tabel kegiatan
+│   ├── index.php             # Tabel kegiatan (Live Search & pemantauan kegiatan per periode)
 │   ├── tambah.php            # Form tambah kegiatan terkait periode
 │   ├── edit.php              # Form edit kegiatan
 │   └── hapus.php             # Handler hapus kegiatan
 │
 ├── peminjaman/               # Modul Transaksi Peminjaman, Pengembalian & Rekap Denda
-│   ├── index.php             # Monitoring sirkulasi, riwayat denda, & tombol bayar QRIS
+│   ├── index.php             # Monitoring sirkulasi, riwayat denda, cetak PDF/CSV, & tombol QRIS
+│   ├── cetak_struk.php       # Cetak struk/slip bukti peminjaman arsip individual per transaksi
 │   ├── tambah.php            # Input form peminjaman arsip
 │   ├── edit.php              # Perubahan status & tanggal pengembalian
 │   └── hapus.php             # Handler hapus riwayat peminjaman
 │
 ├── pengguna/                 # Modul Manajemen Akun & Hak Akses (Khusus Admin)
-│   ├── index.php             # Tabel seluruh akun pengguna
+│   ├── index.php             # Tabel akun pengguna (Live Search nama, username, NIM, jabatan, & role)
 │   ├── tambah.php            # Pembuatan akun admin/pengguna baru
 │   ├── edit.php              # Edit profil, jabatan, role, dan reset password
 │   └── hapus.php             # Handler hapus akun pengguna
 │
 ├── periode/                  # Modul Master Periode Kepengurusan & Divisi
-│   ├── index.php             # Tabel periode kepengurusan & divisi
+│   ├── index.php             # Tabel periode kepengurusan & divisi (Live Search periode & divisi)
 │   ├── tambah.php            # Form tambah periode & divisi
 │   ├── edit.php              # Form edit periode
 │   └── hapus.php             # Handler hapus periode
@@ -193,6 +195,7 @@ erDiagram
     PERIODE ||--o{ KEGIATAN : "memiliki"
     KEGIATAN ||--o{ ARSIP : "menghasilkan"
     PENGGUNA ||--o{ PEMINJAMAN : "melakukan"
+    PENGGUNA ||--o{ PENGELUARAN : "mencatat"
     ARSIP ||--o{ PEMINJAMAN : "dipinjamkan"
 
     PERIODE {
@@ -234,6 +237,17 @@ erDiagram
         date tanggal_pinjam
         date tanggal_kembali
         varchar status_peminjaman "Dipinjam / Dikembalikan"
+    }
+
+    PENGELUARAN {
+        int id_pengeluaran PK
+        date tanggal_pengeluaran
+        varchar judul_pengeluaran "Item Pemeliharaan"
+        varchar kategori_pengeluaran "Recovery/Cloud/Maintenance"
+        varchar jenis_periode "Mingguan/Bulanan/Insidental"
+        int nominal "Biaya Pengeluaran (Rp)"
+        text keterangan
+        int id_pengguna FK
     }
 ```
 
@@ -294,7 +308,9 @@ CREATE TABLE IF NOT EXISTS `arsip` (
   `id_arsip` INT AUTO_INCREMENT PRIMARY KEY,
   `nama_arsip` VARCHAR(255) NOT NULL,
   `nama_file` VARCHAR(255) NULL,
+  `file_arsip` VARCHAR(255) NULL,
   `tanggal_upload` DATE NULL,
+  `jumlah_arsip` INT NOT NULL DEFAULT 1,
   `id_kegiatan` INT NULL,
   CONSTRAINT `fk_arsip_kegiatan` FOREIGN KEY (`id_kegiatan`) 
     REFERENCES `kegiatan` (`id_kegiatan`) ON DELETE SET NULL ON UPDATE CASCADE
@@ -395,10 +411,18 @@ mysqli_set_charset($conn, "utf8mb4");
 ### 2. Panduan untuk Operator / Administrator
 1. **Pusat Pengelolaan Data Master (Management Hub & Ringkasan Eksekutif)**:
    - Dashboard Admin difokuskan sebagai *Executive Overview Workspace* yang rapi dan elegan: menyajikan 6 kartu statistik kunci (**Total Arsip**, **Pengguna Terdaftar**, **Periode & Divisi**, **Total Kegiatan**, **Sedang Dipinjam**, dan **Denda Tertunggak**), serta grid menu pengelolaan data master (**Katalog Arsip**, **Periode & Divisi**, **Kegiatan Organisasi**, **Akun Pengguna**, dan **Sirkulasi Pinjaman**).
-2. **Akses Halaman Dedicated Sirkulasi & Monitoring Denda (via Sidebar)**:
+2. **Akses Halaman Dedicated Sirkulasi, Analisis Tren & Monitoring Denda (via Sidebar)**:
    - Demi menjaga Dashboard utama tetap ringkas, bersih, dan cepat dimuat, tabel sirkulasi dan formulir pencatatan peminjaman dipusatkan pada halaman khusus yang diakses melalui menu sidebar: **Sirkulasi & Monitoring Denda** (mengarah ke `peminjaman/index.php`).
-   - Halaman ini menyajikan antarmuka 2 kolom modern:
-     - **Sisi Kiri**: Tabel monitoring sirkulasi real-time dengan filter pills instan (*Semua*, *Dipinjam*, *Telat/Denda*, *Dikembalikan*) dan kolom pencarian cepat (*instant live search*).
+   - **Diagram Garis Analisis Tren Sirkulasi (Interactive Line Chart)**:
+     - Dilengkapi grafik garis visual interaktif (didukung Chart.js) yang memetakan jumlah berkas arsip yang dipinjam per hari/tanggal.
+     - **Penyaringan Waktu Cepat (*Quick Presets*)**: Tombol 1-klik untuk filter *7 Hari Terakhir (Per Minggu)*, *Minggu Ini*, *30 Hari Terakhir (Per Bulan)*, *Bulan Ini*, dan *Semua Waktu*.
+     - **Request Tanggal Kustom (*Custom Date Range*)**: Panel form pemilihan tanggal disembunyikan secara rapi dan hanya muncul ketika tombol **🗓️ Filter Tanggal ▾** diklik oleh admin (*toggle accordion*), menjaga antarmuka tetap bersih dan tidak sesak.
+     - **Ekspor Dokumen Laporan (Unduh PDF & CSV)**:
+       - **📄 Unduh PDF**: Mencetak laporan resmi rekapitulasi peminjaman bersurat kop SIRAPI dengan tabel bergaris rapi dan kolom tanda tangan pengelola arsip (siap cetak / simpan PDF via browser).
+       - **📊 Unduh CSV**: Mengunduh seluruh data transaksi terfilter ke dalam format file spreadsheet Excel (.csv) berstandar UTF-8 BOM secara instan.
+     - **Ringkasan 4 Metrik Kunci**: Total berkas dipinjam pada rentang waktu aktif, rata-rata sirkulasi per hari, tanggal puncak peminjaman (*peak day*), serta rincian status sirkulasi (*Aktif Dipinjam vs Sudah Selesai*).
+   - **Tampilan 2 Kolom Operasional**:
+     - **Sisi Kiri**: Tabel monitoring sirkulasi real-time yang otomatis tersinkronisasi dengan rentang tanggal aktif, dilengkapi filter pills (*Semua*, *Dipinjam*, *Telat/Denda*, *Dikembalikan*) dan live search instan.
      - Tombol cepat **✓ Selesai** mencatat pengembalian per hari ini secara otomatis tanpa menimpa batas tanggal kembali asli.
      - Tombol **💳 QRIS** membuka popup pembayaran digital, dan tombol **✓ Lunas** untuk verifikasi denda secara instan.
      - **Sisi Kanan**: Formulir **Catat Peminjaman Cepat** (pilih dokumen arsip, anggota UKM peminjam, tanggal pinjam, dan batas tanggal kembali otomatis dihitung **5 hari** ke depan).
@@ -407,7 +431,8 @@ mysqli_set_charset($conn, "utf8mb4");
    - Transaksi dengan denda yang sudah disetor dapat diverifikasi oleh admin secara langsung di halaman Sirkulasi dengan mengklik tombol **✓ Lunas** atau melalui modal pembayaran QRIS/E-Wallet.
 5. **Mengunggah & Mendata Arsip Baru**:
    - Buka menu **Kelola Arsip** $\rightarrow$ **Tambah Arsip**.
-   - Masukkan nama arsip, nama file (atau unggah berkas fisik ke folder arsip), tanggal upload, dan kegiatan yang menaungi arsip tersebut.
+   - Masukkan nama arsip, jumlah arsip (kuantitas fisik yang tersedia), nama file (atau unggah berkas fisik ke folder arsip), tanggal upload, dan kegiatan yang menaungi arsip tersebut.
+   - Pada tabel katalog arsip (`arsip/index.php`), terdapat kolom **Jumlah Arsip** yang menyajikan ketersediaan eksemplar fisik berkas secara langsung dan sinkron dengan basis data.
 6. **Menata Struktur Kepengurusan**:
    - Buat terlebih dahulu **Periode** (contoh: *2026/2027 - Divisi Humas*).
    - Buat **Kegiatan** yang terhubung ke periode tersebut.
@@ -431,6 +456,12 @@ mysqli_set_charset($conn, "utf8mb4");
    - Pada dashboard pengguna, terdapat kolom pencarian untuk menyaring divisi. Pada halaman detail divisi (`divisi_detail.php`), terdapat kolom pencarian khusus untuk menyaring kegiatan dan arsip di divisi tersebut secara instan.
 5. **Kotak Peringatan Aturan Peminjaman di Sidebar**:
    - Tepat di atas tombol *Keluar (Logout)* pada sidebar pengguna, disematkan kartu peringatan (*sidebar warning box*) yang mengingatkan bahwa masa pinjam maksimal berkas adalah **5 hari**, dan pengembalian setelahnya otomatis dinyatakan terlambat serta dikenai denda harian. Hal ini menjaga transparansi dan kedisiplinan sirkulasi arsip UKM.
+6. **Sistem Ketersediaan Stok Arsip Dinamis (Real-Time Stock Availability)**:
+   - Sistem secara otomatis menghitung berkas yang **Tersedia** dan yang **Sedang Dipinjam**:
+     $$\text{Stok Tersedia} = \text{Total Jumlah Arsip} - \text{Total Berkas Sedang Dipinjam}$$
+   - Jika berkas masih tersedia, sistem menampilkan badge hijau `🟢 X Tersedia` dan tombol **Pinjam →** aktif (langsung mengarahkan ke form pinjam dengan arsip terisi otomatis).
+   - Jika semua eksemplar sedang dipinjam anggota lain, sistem otomatis menampilkan badge merah `🔴 Habis Dipinjam` dan tombol dinonaktifkan untuk mencegah peminjaman ganda/berlebih.
+   - Saat peminjam mengembalikan berkas (status `Dikembalikan`), stok ketersediaan otomatis kembali bertambah secara *real-time*.
 
 ---
 
@@ -439,10 +470,9 @@ Sistem SIRAPI menerapkan aturan perhitungan denda proporsional terstruktur:
 - **Batas Waktu Standar**: 5 hari kalender terhitung sejak `tanggal_pinjam`.
 - **Tepat Waktu ($\le 0$ hari)**: **Rp 0** (Status: *Bebas Denda*).
 - **Terlambat 1 hari**: **Rp 20.000**
-- **Terlambat 2 hari**: **Rp 22.500**
-- **Terlambat 3 hari**: **Rp 25.000**
-- **Terlambat 4 hari**: **Rp 30.000**
-- **Terlambat $\ge 5$ hari**: **Rp 30.000 + ((hari - 4) $\times$ Rp 5.000)** (bertambah Rp 5.000 untuk setiap hari berikutnya).
+- **Terlambat 2 hari**: **Rp 25.000**
+- **Terlambat 3 hari**: **Rp 30.000**
+- **Terlambat $\ge 4$ hari**: **Rp 30.000 + ((hari - 3) $\times$ Rp 5.000)** (bertambah Rp 5.000 untuk setiap hari berikutnya).
 
 ---
 
@@ -539,4 +569,6 @@ Bagi developer atau AI Assistant yang mengembangkan fitur baru:
 ---
 
 *Dokumen ini disusun untuk memudahkan kolaborasi antara Operator, Teknisi, dan Engineer dalam mengoperasikan, merawat, dan mengembangkan sistem SIRAPI.*
+
+
 
